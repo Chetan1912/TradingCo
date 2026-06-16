@@ -1,0 +1,373 @@
+/* ============================================================
+   TradingCo Design System — Professional Trading Terminal Theme
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* === CSS Reset === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Background */
+  --bg-primary: #0D1117;
+  --bg-secondary: #161B22;
+  --bg-tertiary: #1C2333;
+  --bg-elevated: #1F2937;
+  --bg-hover: #21262D;
+
+  /* Text */
+  --text-primary: #E6EDF3;
+  --text-secondary: #8B949E;
+  --text-muted: #484F58;
+  --text-inverse: #0D1117;
+
+  /* Borders */
+  --border: #30363D;
+  --border-light: #21262D;
+  --border-focus: #58A6FF;
+
+  /* Accent */
+  --accent-blue: #58A6FF;
+  --accent-blue-hover: #79C0FF;
+  --accent-purple: #BC8CFF;
+
+  /* Trading colors */
+  --profit-green: #3FB950;
+  --profit-green-bg: rgba(63, 185, 80, 0.1);
+  --profit-green-border: rgba(63, 185, 80, 0.3);
+  --loss-red: #F85149;
+  --loss-red-bg: rgba(248, 81, 73, 0.1);
+  --loss-red-border: rgba(248, 81, 73, 0.3);
+  --warning-amber: #D29922;
+  --warning-amber-bg: rgba(210, 153, 34, 0.1);
+
+  /* Chart */
+  --chart-grid: #21262D;
+  --chart-crosshair: #484F58;
+  --chart-volume-up: rgba(63, 185, 80, 0.5);
+  --chart-volume-down: rgba(248, 81, 73, 0.5);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
+  --space-4xl: 40px;
+  --space-5xl: 48px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-glow-green: 0 0 10px rgba(63, 185, 80, 0.3);
+  --shadow-glow-red: 0 0 10px rgba(248, 81, 73, 0.3);
+  --shadow-glow-blue: 0 0 15px rgba(88, 166, 255, 0.2);
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* Font sizes */
+  --text-xs: 0.6875rem;
+  --text-sm: 0.75rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Layout */
+  --sidebar-width: 64px;
+  --sidebar-expanded: 220px;
+  --header-height: 56px;
+  --panel-min-width: 280px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+html, body, #root {
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* === Selection === */
+::selection {
+  background: rgba(88, 166, 255, 0.3);
+  color: var(--text-primary);
+}
+
+/* === Focus === */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* === Links === */
+a { color: var(--accent-blue); text-decoration: none; transition: color var(--transition-fast); }
+a:hover { color: var(--accent-blue-hover); }
+
+/* === Utility Classes === */
+.mono { font-family: var(--font-mono); }
+.text-green { color: var(--profit-green); }
+.text-red { color: var(--loss-red); }
+.text-amber { color: var(--warning-amber); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-right { text-align: right; }
+
+/* === Price Flash Animations === */
+@keyframes flashGreen {
+  0% { background-color: var(--profit-green-bg); }
+  100% { background-color: transparent; }
+}
+@keyframes flashRed {
+  0% { background-color: var(--loss-red-bg); }
+  100% { background-color: transparent; }
+}
+.flash-green { animation: flashGreen 600ms ease-out; }
+.flash-red { animation: flashRed 600ms ease-out; }
+
+/* === Skeleton Loading === */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-hover) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* === Toast === */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* === Pulse (live indicators) === */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* === Fade In === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 300ms ease-out; }
+
+/* === Spin === */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* === Buttons === */
+button {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  padding: var(--space-sm) var(--space-lg);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent-blue-hover); }
+
+.btn-buy {
+  background: var(--profit-green);
+  color: #fff;
+  padding: var(--space-sm) var(--space-xl);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.btn-buy:hover:not(:disabled) { box-shadow: var(--shadow-glow-green); }
+
+.btn-sell {
+  background: var(--loss-red);
+  color: #fff;
+  padding: var(--space-sm) var(--space-xl);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.btn-sell:hover:not(:disabled) { box-shadow: var(--shadow-glow-red); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: var(--space-sm) var(--space-md);
+}
+.btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--accent-blue);
+  border: 1px solid var(--border);
+  padding: var(--space-sm) var(--space-lg);
+}
+.btn-outline:hover { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.08); }
+
+/* === Inputs === */
+input, select, textarea {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+}
+input::placeholder { color: var(--text-muted); }
+select { cursor: pointer; }
+
+/* === Tables === */
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 1;
+}
+td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--text-base);
+  white-space: nowrap;
+}
+tr:hover td { background-color: var(--bg-hover); }
+td.mono { font-family: var(--font-mono); }
+
+/* === Card === */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.card-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-header h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+.card-body {
+  padding: var(--space-lg);
+}
+
+/* === Badge === */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-green { background: var(--profit-green-bg); color: var(--profit-green); border: 1px solid var(--profit-green-border); }
+.badge-red { background: var(--loss-red-bg); color: var(--loss-red); border: 1px solid var(--loss-red-border); }
+.badge-amber { background: var(--warning-amber-bg); color: var(--warning-amber); border: 1px solid rgba(210, 153, 34, 0.3); }
+.badge-blue { background: rgba(88, 166, 255, 0.1); color: var(--accent-blue); border: 1px solid rgba(88, 166, 255, 0.3); }
+.badge-gray { background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+    --header-height: 48px;
+  }
+}
+
+/* === Responsive Grid Layouts === */
+.grid-responsive-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.grid-responsive-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-lg);
+}
+
+.grid-responsive-journal {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 992px) {
+  .grid-responsive-2col {
+    grid-template-columns: 1fr;
+  }
+  .grid-responsive-sidebar {
+    grid-template-columns: 1fr;
+  }
+  .grid-responsive-journal {
+    grid-template-columns: 1fr;
+  }
+}
+

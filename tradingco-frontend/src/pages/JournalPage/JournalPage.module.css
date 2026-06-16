@@ -1,0 +1,20 @@
+/* CSS Modules styling for Journal Page */
+.successBanner {
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid var(--profit-green);
+  color: var(--profit-green);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-md);
+}
+
+.errorBanner {
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid var(--loss-red);
+  color: var(--loss-red);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-md);
+}

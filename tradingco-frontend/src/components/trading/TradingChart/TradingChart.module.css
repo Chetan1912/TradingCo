@@ -1,0 +1,129 @@
+.chartContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+}
+
+.chartWrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.symbolInfo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+}
+
+.symbolName {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.symbolPrice {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.symbolChange {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.tfBtn {
+  padding: 4px 10px;
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-mono);
+}
+
+.tfBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.tfBtn.active {
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  border-color: var(--accent-blue);
+}
+
+.chartTypeBtn {
+  padding: 4px 8px;
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  margin-left: var(--space-sm);
+}
+
+.chartTypeBtn:hover { color: var(--text-primary); }
+.chartTypeBtn.active { color: var(--accent-blue); }
+
+.indicatorBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 2px var(--space-md);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.indicatorChip {
+  padding: 2px 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.indicatorChip:hover { border-color: var(--border-focus); }
+.indicatorChip.active { background: rgba(88, 166, 255, 0.15); color: var(--accent-blue); border-color: var(--accent-blue); }
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+}
+
+.crosshairData {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.crosshairData span { margin-right: var(--space-xs); }

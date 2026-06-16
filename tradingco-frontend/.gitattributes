@@ -1,0 +1,2 @@
+# Force LF line endings for env files to prevent \r being included in values on Linux
+.env* text eol=lf

@@ -1,0 +1,130 @@
+.header {
+  height: var(--header-height);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-lg);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.logo {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-right: var(--space-2xl);
+}
+
+.logo span { color: var(--accent-blue); }
+
+.searchWrapper {
+  flex: 1;
+  max-width: 420px;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: var(--text-lg);
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md) var(--space-sm) 36px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+}
+
+.searchInput:focus { border-color: var(--border-focus); }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-left: auto;
+}
+
+.marketStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--loss-red);
+}
+
+.statusDot.open {
+  background: var(--profit-green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.iconBtn {
+  background: none;
+  color: var(--text-secondary);
+  font-size: var(--text-xl);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.iconBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.menuBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--text-xl);
+  cursor: pointer;
+  padding: var(--space-sm);
+  margin-right: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+  .menuBtn {
+    display: block;
+  }
+  .logo {
+    margin-right: var(--space-sm);
+    font-size: var(--text-base);
+  }
+  .searchWrapper {
+    max-width: 180px;
+  }
+  .marketStatus {
+    display: none;
+  }
+  .actions {
+    gap: var(--space-sm);
+  }
+}

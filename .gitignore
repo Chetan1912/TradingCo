@@ -1,0 +1,33 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Java / Maven
+tradingco-backend/target/
+*.class
+*.jar
+*.war
+
+# Node.js
+tradingco-frontend/node_modules/
+tradingco-frontend/dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel/
+
+# Neon
+.neon

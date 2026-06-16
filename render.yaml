@@ -1,0 +1,30 @@
+services:
+  # Spring Boot Backend Web Service
+  - type: web
+    name: tradingco-backend
+    env: docker
+    dockerContext: ./tradingco-backend
+    dockerfilePath: ./tradingco-backend/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false # Paste: jdbc:postgresql://ep-bitter-night-a6qq1frm.us-west-2.aws.neon.tech/neondb?sslmode=require
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false # Paste: neondb_owner
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false # Paste: npg_8qufKUTMI7lQ
+      - key: SPRING_REDIS_HOST
+        value: tradingco-redis
+      - key: SPRING_REDIS_PORT
+        value: "6379"
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Redis Service
+  - type: redis
+    name: tradingco-redis
+    plan: free
+    ipAllowList: [] # only allow internal access
+
+
+
