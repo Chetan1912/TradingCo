@@ -4,18 +4,24 @@ import useAccountStore from '../../../store/useAccountStore';
 import styles from './PositionsTable.module.css';
 
 export default function PositionsTable({ positions = [] }) {
-  const submitOrder = useOrderStore((s) => s.submitOrder);
+  const placeOrder = useOrderStore((s) => s.placeOrder);
   const activeAccount = useAccountStore((s) => s.activeAccount);
 
-  const handleClose = (pos) => {
+  const handleClose = async (pos) => {
     if (!activeAccount?.id) return;
-    submitOrder({
-      accountId: activeAccount.id,
-      symbol: pos.symbol,
-      side: pos.side === 'BUY' ? 'SELL' : 'BUY',
-      type: 'MARKET',
-      quantity: pos.quantity,
-    });
+    try {
+      await placeOrder({
+        accountId: activeAccount.id,
+        symbol: pos.symbol,
+        side: pos.side === 'BUY' ? 'SELL' : 'BUY',
+        orderType: 'MARKET',
+        quantity: pos.quantity,
+        timeInForce: 'DAY'
+      });
+    } catch (err) {
+      console.error('Failed to close position:', err);
+      alert('Failed to close position. Check console.');
+    }
   };
 
   if (!positions.length) {

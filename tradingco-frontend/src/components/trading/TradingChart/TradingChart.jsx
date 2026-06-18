@@ -66,7 +66,7 @@ export default function TradingChart({ symbol = 'AAPL', onSymbolChange }) {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
   const seriesRef = useRef({});
-  const [activeTimeframe, setActiveTimeframe] = useState('1D');
+  const [activeTimeframe, setActiveTimeframe] = useState('1m');
   const [activeIndicators, setActiveIndicators] = useState(['SMA 20']);
   const [crosshairData, setCrosshairData] = useState(null);
   
