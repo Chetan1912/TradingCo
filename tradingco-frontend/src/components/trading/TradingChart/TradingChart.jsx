@@ -7,7 +7,7 @@ import usePortfolioStore from '../../../store/usePortfolioStore';
 import styles from './TradingChart.module.css';
 
 const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1D', '1W'];
-const INDICATORS = ['SMA 20', 'EMA 12', 'EMA 26', 'BB', 'VWAP'];
+const INDICATORS = ['SMA 20', 'EMA 12', 'EMA 26', 'BB', 'RSI', 'MACD'];
 
 const CHART_COLORS = {
   background: '#0D1117',
@@ -246,6 +246,28 @@ export default function TradingChart({ symbol = 'AAPL', onSymbolChange }) {
       sl.setData(bb.lower);
       sm.setData(bb.middle);
       indicatorSeries.push(su, sl, sm);
+    }
+
+    if (activeIndicators.includes('RSI')) {
+      const rsiData = calculateRSI(chartData, 14);
+      const s = chart.addSeries(LineSeries, { color: '#B266FF', lineWidth: 2, priceScaleId: 'rsi' });
+      chart.priceScale('rsi').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
+      s.setData(rsiData);
+      indicatorSeries.push(s);
+    }
+
+    if (activeIndicators.includes('MACD')) {
+      const macd = calculateMACD(chartData, 12, 26, 9);
+      const lineSeries = chart.addSeries(LineSeries, { color: '#2962FF', lineWidth: 1, priceScaleId: 'macd' });
+      const signalSeries = chart.addSeries(LineSeries, { color: '#FF6D00', lineWidth: 1, priceScaleId: 'macd' });
+      const histSeries = chart.addSeries(HistogramSeries, { priceScaleId: 'macd' });
+      
+      chart.priceScale('macd').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
+      
+      lineSeries.setData(macd.macdLine);
+      signalSeries.setData(macd.signalLine);
+      histSeries.setData(macd.histogram);
+      indicatorSeries.push(lineSeries, signalSeries, histSeries);
     }
 
     seriesRef.current.indicators = indicatorSeries;

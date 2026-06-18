@@ -10,6 +10,7 @@ import OrderTicket from '../../components/trading/OrderTicket/OrderTicket';
 import WatchlistPanel from '../../components/trading/WatchlistPanel/WatchlistPanel';
 import PositionsTable from '../../components/trading/PositionsTable/PositionsTable';
 import OrderHistoryTable from '../../components/trading/OrderHistoryTable/OrderHistoryTable';
+import OrderBook from '../../components/trading/OrderBook/OrderBook';
 import { formatCurrency, formatPercent, getPnlClass } from '../../utils/formatters';
 import styles from './DashboardPage.module.css';
 
@@ -109,13 +110,26 @@ export default function DashboardPage() {
         <TradingChart symbol={activeSymbol} />
       </div>
 
-      {/* Order Ticket */}
-      <div className={`${styles.panel} ${styles.orderPanel}`}>
-        <div className={styles.panelHeader}>
-          <h3>📋 Order Ticket</h3>
+      {/* Right Column: Order Ticket & Order Book */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', gridRow: '2' }}>
+        {/* Order Ticket */}
+        <div className={styles.panel} style={{ flexShrink: 0 }}>
+          <div className={styles.panelHeader}>
+            <h3>📋 Order Ticket</h3>
+          </div>
+          <div className={styles.panelBody}>
+            <OrderTicket symbol={activeSymbol} lastPrice={selectedSymbolPrice} />
+          </div>
         </div>
-        <div className={styles.panelBody}>
-          <OrderTicket symbol={activeSymbol} lastPrice={selectedSymbolPrice} />
+
+        {/* Order Book */}
+        <div className={styles.panel} style={{ flex: 1 }}>
+          <div className={styles.panelHeader}>
+            <h3>📚 Order Book</h3>
+          </div>
+          <div className={styles.panelBody} style={{ padding: 0, overflow: 'hidden' }}>
+            <OrderBook symbol={activeSymbol} />
+          </div>
         </div>
       </div>
 
