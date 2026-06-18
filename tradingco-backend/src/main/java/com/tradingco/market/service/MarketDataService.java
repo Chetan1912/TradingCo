@@ -80,6 +80,9 @@ public class MarketDataService {
             // Process pending limit/stop orders against the new prices
             orderExecutionService.checkPendingOrders();
 
+            // Evaluate active positions for Stop Loss / Take Profit
+            orderExecutionService.checkPositionsRisk(updatedQuotes);
+
             // Evaluate active price alerts
             alertService.checkAlerts(updatedQuotes);
 

@@ -33,6 +33,7 @@ export default function PositionsTable({ positions = [] }) {
             <th className={styles.right}>Avg Cost</th>
             <th className={styles.right}>Current</th>
             <th className={styles.right}>Mkt Value</th>
+            <th className={styles.right}>SL/TP</th>
             <th className={styles.right}>Unrealized P&L</th>
             <th className={styles.right}>P&L %</th>
             <th className={styles.right}>Action</th>
@@ -55,6 +56,12 @@ export default function PositionsTable({ positions = [] }) {
               <td className={`${styles.right} ${styles.mono}`}>{formatCurrency(pos.avgCost)}</td>
               <td className={`${styles.right} ${styles.mono}`}>{formatCurrency(pos.currentPrice)}</td>
               <td className={`${styles.right} ${styles.mono}`}>{formatCurrency(pos.marketValue)}</td>
+              <td className={`${styles.right} ${styles.mono}`}>
+                {pos.stopLoss ? `SL: ${formatCurrency(pos.stopLoss)}` : ''}
+                {pos.stopLoss && pos.takeProfit ? <br /> : ''}
+                {pos.takeProfit ? `TP: ${formatCurrency(pos.takeProfit)}` : ''}
+                {!pos.stopLoss && !pos.takeProfit ? '-' : ''}
+              </td>
               <td className={`${styles.right} ${styles.mono} ${getPnlClass(pos.unrealizedPnl)}`}>
                 {pos.unrealizedPnl >= 0 ? '+' : ''}{formatCurrency(pos.unrealizedPnl)}
               </td>

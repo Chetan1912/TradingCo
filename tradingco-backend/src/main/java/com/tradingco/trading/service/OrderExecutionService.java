@@ -250,6 +250,8 @@ public class OrderExecutionService {
                             .divide(BigDecimal.valueOf(newQty), 6, RoundingMode.HALF_UP);
                     pos.setQuantity(newQty);
                     pos.setAvgCost(newCost);
+                    if (order.getStopLoss() != null) pos.setStopLoss(order.getStopLoss());
+                    if (order.getTakeProfit() != null) pos.setTakeProfit(order.getTakeProfit());
                     pos.updateMarketData(fillPrice);
                     positionRepository.save(pos);
                 } else {
@@ -264,6 +266,8 @@ public class OrderExecutionService {
                         .side(Side.BUY)
                         .quantity(order.getQuantity())
                         .avgCost(fillPrice)
+                        .stopLoss(order.getStopLoss())
+                        .takeProfit(order.getTakeProfit())
                         .build();
                 pos.updateMarketData(fillPrice);
                 positionRepository.save(pos);
@@ -271,7 +275,74 @@ public class OrderExecutionService {
         } else { // SELL
             if (existingPos.isPresent()) {
                 Position pos = existingPos.get();
-                closeOrReducePosition(pos, order, fillPrice);
+                if (pos.getSide() == Side.SELL) {
+                    int newQty = pos.getQuantity() + order.getQuantity();
+                    BigDecimal newCost = pos.getAvgCost().multiply(BigDecimal.valueOf(pos.getQuantity()))
+                            .add(fillPrice.multiply(BigDecimal.valueOf(order.getQuantity())))
+                            .divide(BigDecimal.valueOf(newQty), 6, RoundingMode.HALF_UP);
+                    pos.setQuantity(newQty);
+                    pos.setAvgCost(newCost);
+                    if (order.getStopLoss() != null) pos.setStopLoss(order.getStopLoss());
+                    if (order.getTakeProfit() != null) pos.setTakeProfit(order.getTakeProfit());
+                    pos.updateMarketData(fillPrice);
+                    positionRepository.save(pos);
+                } else {
+                    closeOrReducePosition(pos, order, fillPrice);
+                }
+            } else {
+                Position pos = Position.builder()
+                        .accountId(order.getAccountId())
+                        .symbol(order.getSymbol())
+                        .side(Side.SELL)
+                        .quantity(order.getQuantity())
+                        .avgCost(fillPrice)
+                        .stopLoss(order.getStopLoss())
+                        .takeProfit(order.getTakeProfit())
+                        .build();
+                pos.updateMarketData(fillPrice);
+                positionRepository.save(pos);
+            }
+        }
+    }
+
+    /**
+     * Scan active positions for SL/TP breaches and auto-close them.
+     */
+    @Transactional
+    public void checkPositionsRisk(List<Quote> currentQuotes) {
+        List<Position> activePositions = positionRepository.findAll();
+        Map<String, Quote> quoteMap = new HashMap<>();
+        for (Quote q : currentQuotes) quoteMap.put(q.getSymbol(), q);
+
+        for (Position pos : activePositions) {
+            if (pos.getQuantity() <= 0) continue;
+            Quote quote = quoteMap.get(pos.getSymbol());
+            if (quote == null) continue;
+
+            BigDecimal currentPrice = quote.getLastPrice();
+            boolean shouldClose = false;
+
+            if (pos.getSide() == Side.BUY) {
+                if (pos.getStopLoss() != null && currentPrice.compareTo(pos.getStopLoss()) <= 0) shouldClose = true;
+                if (pos.getTakeProfit() != null && currentPrice.compareTo(pos.getTakeProfit()) >= 0) shouldClose = true;
+            } else { // SELL
+                if (pos.getStopLoss() != null && currentPrice.compareTo(pos.getStopLoss()) >= 0) shouldClose = true;
+                if (pos.getTakeProfit() != null && currentPrice.compareTo(pos.getTakeProfit()) <= 0) shouldClose = true;
+            }
+
+            if (shouldClose) {
+                log.info("Auto-closing position {} due to SL/TP trigger. Price: {}", pos.getId(), currentPrice);
+                Order closeOrder = Order.builder()
+                        .accountId(pos.getAccountId())
+                        .symbol(pos.getSymbol())
+                        .side(pos.getSide() == Side.BUY ? Side.SELL : Side.BUY)
+                        .orderType(OrderType.MARKET)
+                        .status(OrderStatus.ACCEPTED)
+                        .quantity(pos.getQuantity())
+                        .build();
+                orderRepository.save(closeOrder);
+                BigDecimal fillPrice = calculateFillPrice(quote, closeOrder.getSide());
+                executeOrder(closeOrder, fillPrice, accountRepository.findById(pos.getAccountId()).orElseThrow());
             }
         }
     }

@@ -45,6 +45,12 @@ public class Position {
     @Column(name = "unrealized_pnl_pct")
     private BigDecimal unrealizedPnlPct;
 
+    @Column(name = "stop_loss")
+    private BigDecimal stopLoss;
+
+    @Column(name = "take_profit")
+    private BigDecimal takeProfit;
+
     @Column(name = "opened_at")
     private LocalDateTime openedAt;
 
