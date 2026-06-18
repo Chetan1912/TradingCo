@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { createChart, CandlestickSeries, LineSeries, HistogramSeries } from 'lightweight-charts';
 import { calculateSMA, calculateEMA, calculateRSI, calculateMACD, calculateBollingerBands } from '../../../utils/indicators';
 import { formatCurrency, formatPercent, getPnlClass } from '../../../utils/formatters';
+import useMarketStore from '../../../store/useMarketStore';
 import styles from './TradingChart.module.css';
 
 const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1D', '1W'];
@@ -65,8 +66,29 @@ export default function TradingChart({ symbol = 'AAPL', onSymbolChange }) {
   const [activeIndicators, setActiveIndicators] = useState(['SMA 20']);
   const [crosshairData, setCrosshairData] = useState(null);
 
+  const quote = useMarketStore((s) => s.quotes[symbol]);
+  const livePrice = quote?.last_price;
+
   // Generate chart data (mock for now, will be replaced with API)
   const chartData = useMemo(() => generateMockCandles(symbol, activeTimeframe), [symbol, activeTimeframe]);
+
+  // Dynamically update the last candle when live price changes
+  useEffect(() => {
+    if (!livePrice || !seriesRef.current.candles || chartData.length === 0) return;
+    
+    const lastData = chartData[chartData.length - 1];
+    if (lastData.close === livePrice) return;
+    
+    lastData.close = livePrice;
+    lastData.high = Math.max(lastData.high, livePrice);
+    lastData.low = Math.min(lastData.low, livePrice);
+    
+    try {
+      seriesRef.current.candles.update(lastData);
+    } catch (e) {
+      // Ignore lightweight-chart update errors during unmounts
+    }
+  }, [livePrice, chartData]);
 
   const lastCandle = chartData[chartData.length - 1];
   const prevCandle = chartData[chartData.length - 2];
