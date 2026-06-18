@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import { formatCurrency, formatPercent, getPnlClass } from '../../../utils/formatters';
 import useOrderStore from '../../../store/useOrderStore';
 import useAccountStore from '../../../store/useAccountStore';
 import styles from './PositionsTable.module.css';
 
 export default function PositionsTable({ positions = [] }) {
+  const [closingId, setClosingId] = useState(null);
   const placeOrder = useOrderStore((s) => s.placeOrder);
   const activeAccount = useAccountStore((s) => s.activeAccount);
 
   const handleClose = async (pos) => {
     if (!activeAccount?.id) return;
+    setClosingId(pos.id || pos.symbol);
     try {
       await placeOrder({
         accountId: activeAccount.id,
@@ -20,7 +23,9 @@ export default function PositionsTable({ positions = [] }) {
       });
     } catch (err) {
       console.error('Failed to close position:', err);
-      alert('Failed to close position. Check console.');
+      alert('Failed to close position: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setClosingId(null);
     }
   };
 
@@ -78,8 +83,10 @@ export default function PositionsTable({ positions = [] }) {
                 <button 
                   className={styles.closeBtn} 
                   onClick={() => handleClose(pos)}
+                  disabled={closingId === (pos.id || pos.symbol)}
+                  style={{ opacity: closingId === (pos.id || pos.symbol) ? 0.5 : 1 }}
                 >
-                  Close
+                  {closingId === (pos.id || pos.symbol) ? 'Closing...' : 'Close'}
                 </button>
               </td>
             </tr>

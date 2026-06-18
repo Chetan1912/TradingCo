@@ -174,10 +174,15 @@ public class OrderExecutionService {
         if (order.getQuantity() > 100000) throw new OrderValidationException("Max 100,000 shares per order");
 
         if (order.getSide() == Side.BUY) {
-            BigDecimal estimatedCost = quote.getAsk().multiply(BigDecimal.valueOf(order.getQuantity()));
-            if (estimatedCost.compareTo(account.getCashBalance()) > 0) {
-                throw new InsufficientFundsException(
-                        "Insufficient funds. Need " + estimatedCost + " but have " + account.getCashBalance());
+            Optional<Position> pos = positionRepository.findByAccountIdAndSymbol(account.getId(), order.getSymbol());
+            boolean isClosingShort = pos.isPresent() && pos.get().getSide() == Side.SELL;
+            
+            if (!isClosingShort) {
+                BigDecimal estimatedCost = quote.getAsk().multiply(BigDecimal.valueOf(order.getQuantity()));
+                if (estimatedCost.compareTo(account.getCashBalance()) > 0) {
+                    throw new InsufficientFundsException(
+                            "Insufficient funds. Need " + estimatedCost + " but have " + account.getCashBalance());
+                }
             }
         } else {
             // For SELL, check if user has the position
