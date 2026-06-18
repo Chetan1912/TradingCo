@@ -1,7 +1,23 @@
 import { formatCurrency, formatPercent, getPnlClass } from '../../../utils/formatters';
+import useOrderStore from '../../../store/useOrderStore';
+import useAccountStore from '../../../store/useAccountStore';
 import styles from './PositionsTable.module.css';
 
 export default function PositionsTable({ positions = [] }) {
+  const submitOrder = useOrderStore((s) => s.submitOrder);
+  const activeAccount = useAccountStore((s) => s.activeAccount);
+
+  const handleClose = (pos) => {
+    if (!activeAccount?.id) return;
+    submitOrder({
+      accountId: activeAccount.id,
+      symbol: pos.symbol,
+      side: pos.side === 'BUY' ? 'SELL' : 'BUY',
+      type: 'MARKET',
+      quantity: pos.quantity,
+    });
+  };
+
   if (!positions.length) {
     return <div className={styles.empty}>No open positions. Place your first trade!</div>;
   }
@@ -19,6 +35,7 @@ export default function PositionsTable({ positions = [] }) {
             <th className={styles.right}>Mkt Value</th>
             <th className={styles.right}>Unrealized P&L</th>
             <th className={styles.right}>P&L %</th>
+            <th className={styles.right}>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +60,14 @@ export default function PositionsTable({ positions = [] }) {
               </td>
               <td className={`${styles.right} ${styles.mono} ${getPnlClass(pos.unrealizedPnlPct)}`}>
                 {pos.unrealizedPnlPct >= 0 ? '+' : ''}{formatPercent(pos.unrealizedPnlPct)}
+              </td>
+              <td className={styles.right}>
+                <button 
+                  className={styles.closeBtn} 
+                  onClick={() => handleClose(pos)}
+                >
+                  Close
+                </button>
               </td>
             </tr>
           ))}

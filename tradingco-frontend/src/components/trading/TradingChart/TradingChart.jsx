@@ -3,6 +3,7 @@ import { createChart, CandlestickSeries, LineSeries, HistogramSeries } from 'lig
 import { calculateSMA, calculateEMA, calculateRSI, calculateMACD, calculateBollingerBands } from '../../../utils/indicators';
 import { formatCurrency, formatPercent, getPnlClass } from '../../../utils/formatters';
 import useMarketStore from '../../../store/useMarketStore';
+import usePortfolioStore from '../../../store/usePortfolioStore';
 import styles from './TradingChart.module.css';
 
 const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1D', '1W'];
@@ -35,9 +36,12 @@ function generateMockCandles(symbol, timeframe, count = 200) {
   let basePrice = 100 + (seed % 400);
   const now = Math.floor(Date.now() / 1000);
   const intervalSec = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1D': 86400, '1W': 604800 }[timeframe] || 86400;
+  
+  // Align to interval boundary
+  const currentIntervalTime = now - (now % intervalSec);
 
   for (let i = count; i > 0; i--) {
-    const time = now - i * intervalSec;
+    const time = currentIntervalTime - (i - 1) * intervalSec;
     const change = (next() - 0.48) * basePrice * 0.025;
     const open = basePrice;
     const close = basePrice + change;
@@ -65,6 +69,8 @@ export default function TradingChart({ symbol = 'AAPL', onSymbolChange }) {
   const [activeTimeframe, setActiveTimeframe] = useState('1D');
   const [activeIndicators, setActiveIndicators] = useState(['SMA 20']);
   const [crosshairData, setCrosshairData] = useState(null);
+  
+  const positions = usePortfolioStore((s) => s.positions);
 
   const quote = useMarketStore((s) => s.quotes[symbol]);
   const livePrice = quote?.last_price;
@@ -77,18 +83,78 @@ export default function TradingChart({ symbol = 'AAPL', onSymbolChange }) {
     if (!livePrice || !seriesRef.current.candles || chartData.length === 0) return;
     
     const lastData = chartData[chartData.length - 1];
-    if (lastData.close === livePrice) return;
     
-    lastData.close = livePrice;
-    lastData.high = Math.max(lastData.high, livePrice);
-    lastData.low = Math.min(lastData.low, livePrice);
+    const nowSec = Math.floor(Date.now() / 1000);
+    const intervalSec = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1D': 86400, '1W': 604800 }[activeTimeframe] || 86400;
+    const currentIntervalTime = nowSec - (nowSec % intervalSec);
     
-    try {
-      seriesRef.current.candles.update(lastData);
-    } catch (e) {
-      // Ignore lightweight-chart update errors during unmounts
+    if (currentIntervalTime > lastData.time) {
+      // Create a brand new candle
+      const newCandle = {
+        time: currentIntervalTime,
+        open: lastData.close,
+        high: Math.max(lastData.close, livePrice),
+        low: Math.min(lastData.close, livePrice),
+        close: livePrice,
+        volume: 0
+      };
+      chartData.push(newCandle);
+      try {
+        seriesRef.current.candles.update(newCandle);
+        if (seriesRef.current.volume) {
+          seriesRef.current.volume.update({
+            time: currentIntervalTime,
+            value: 0,
+            color: 'rgba(63, 185, 80, 0.25)'
+          });
+        }
+      } catch (e) {}
+    } else {
+      // Update existing candle
+      if (lastData.close === livePrice) return;
+      lastData.close = livePrice;
+      lastData.high = Math.max(lastData.high, livePrice);
+      lastData.low = Math.min(lastData.low, livePrice);
+      
+      try {
+        seriesRef.current.candles.update(lastData);
+      } catch (e) {
+        // Ignore lightweight-chart update errors during unmounts
+      }
     }
-  }, [livePrice, chartData]);
+  }, [livePrice, chartData, activeTimeframe]);
+
+  // Handle drawing open position lines on the chart
+  useEffect(() => {
+    if (!seriesRef.current.candles) return;
+    
+    // Clear existing price lines
+    if (seriesRef.current.positionLines) {
+      seriesRef.current.positionLines.forEach((line) => {
+        try { seriesRef.current.candles.removePriceLine(line); } catch (e) {}
+      });
+    }
+    seriesRef.current.positionLines = [];
+
+    // Find positions for the active symbol
+    const activePositions = positions.filter((p) => p.symbol === symbol && p.quantity > 0);
+    
+    activePositions.forEach((pos) => {
+      const isLong = pos.side === 'BUY';
+      const color = isLong ? '#3FB950' : '#F85149';
+      const title = `${isLong ? 'Long' : 'Short'} ${pos.quantity} @ ${formatCurrency(pos.avgCost || pos.entry_price)}`;
+      
+      const line = seriesRef.current.candles.createPriceLine({
+        price: pos.avgCost || pos.entry_price,
+        color: color,
+        lineWidth: 2,
+        lineStyle: 2, // Dashed
+        axisLabelVisible: true,
+        title: title,
+      });
+      seriesRef.current.positionLines.push(line);
+    });
+  }, [positions, symbol]);
 
   const lastCandle = chartData[chartData.length - 1];
   const prevCandle = chartData[chartData.length - 2];

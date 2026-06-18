@@ -64,3 +64,19 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.closeBtn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-muted);
+}
+
