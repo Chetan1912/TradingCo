@@ -19,6 +19,7 @@ const INDEX_SYMBOLS = ['SPY', 'QQQ', 'DIA', 'IWM', 'VIX'];
 export default function DashboardPage() {
   const wsHook = useWebSocket();
   const [activeSymbol, setActiveSymbol] = useState('AAPL');
+  const [chartLayout, setChartLayout] = useState('1'); // '1', '2h', '2v', '4'
   const [bottomTab, setBottomTab] = useState('positions');
 
   // Stores
@@ -107,7 +108,35 @@ export default function DashboardPage() {
 
       {/* Chart Area */}
       <div className={`${styles.panel} ${styles.chartArea}`}>
-        <TradingChart symbol={activeSymbol} />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px 12px', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border)' }}>
+          <select 
+            value={chartLayout} 
+            onChange={e => setChartLayout(e.target.value)} 
+            style={{ 
+              background: 'var(--bg-surface)', color: 'var(--text-primary)', 
+              border: '1px solid var(--border)', borderRadius: '4px', padding: '2px 8px', fontSize: '12px'
+            }}
+          >
+            <option value="1">1 Chart (1x1)</option>
+            <option value="2h">2 Charts (Horizontal)</option>
+            <option value="2v">2 Charts (Vertical)</option>
+            <option value="4">4 Charts (2x2)</option>
+          </select>
+        </div>
+        <div style={{ 
+          display: 'grid', flex: 1, gap: '1px', background: 'var(--border)',
+          gridTemplateColumns: (chartLayout === '2v' || chartLayout === '4') ? '1fr 1fr' : '1fr',
+          gridTemplateRows: (chartLayout === '2h' || chartLayout === '4') ? '1fr 1fr' : '1fr'
+        }}>
+          <TradingChart symbol={activeSymbol} />
+          {chartLayout !== '1' && <TradingChart symbol="MSFT" />}
+          {chartLayout === '4' && (
+            <>
+              <TradingChart symbol="TSLA" />
+              <TradingChart symbol="NVDA" />
+            </>
+          )}
+        </div>
       </div>
 
       {/* Right Column: Order Ticket & Order Book */}
